@@ -14,7 +14,6 @@ var request = require('request'),
 var myHarmonyUrl = 'https://svcs.myharmony.com/CompositeSecurityServices/Security.svc/json/GetUserAuthToken';
 
 function HarmonyAuth() {
-	var self = this;
 	this.userToken = undefined;
 	this.sessionToken = undefined;
 };

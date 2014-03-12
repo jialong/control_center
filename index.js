@@ -4,12 +4,12 @@
 
 'use strict';
 
-var HarmonyClient = require('./harmony/index');
-var lifx = require('../lifxjs');
+var HarmonyClient = require('./harmony/index')
+   ,lifx = require('../lifxjs')
+   ,tcp = require('./tcp_connect/tcp')
+   ,express = require('express')
+   ;
 
-var client = new HarmonyClient();
-client.getCurrentActivity();
-//client.getHubConfig();
-//client.startActivity(8186139);
-//client.powerOff();
+
+
 
