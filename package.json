@@ -1,0 +1,12 @@
+{
+  "name": "control-center",
+  "description": "Control Center for Home Automation",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.5.0",
+    "request": "2.34.0",
+    "node-xmpp-client": "0.4.0",
+    "ltx": "0.4.1"
+  }
+}

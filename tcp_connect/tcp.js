@@ -198,6 +198,7 @@ TcpConnect.prototype.roomSetLevel = function (rid, dimLevel) {
 	
 };
 
+/*
 var tcp = new TcpConnect();
 tcp.on('ready', function() {
 	// tcp.bulbSetLevel('216542398414259727', 80);	
@@ -213,5 +214,5 @@ tcp.on('ready', function() {
 	
 	tcp.roomOnOff('1', 1);
 });
-
+*/
 

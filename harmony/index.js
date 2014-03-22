@@ -15,11 +15,26 @@ function HarmonyClient() {
 	var auth = new HarmonyAuth();
 	
 	var self = this;
+	this.activities = {};
 	auth.once('auth', function(sessionToken) {
 		console.log('Token: '+sessionToken);
 		self.sessionToken = sessionToken;
 		self.authenticated = true;
 		self.emit('auth');
+		
+		self.getHubConfig();
+		self.once('config', function(confData) {
+			console.log('config done');
+			var confObj = JSON.parse(confData);
+			
+			if (typeof confObj.activity != 'undefined') {
+				for (var i=0; i< confObj.activity.length; i++) {
+					self.activities[confObj.activity[i].label] = confObj.activity[i].id;
+				}
+				
+				// console.log(self.activities);
+			}
+		});
 	});
 	
 	auth.auth();
@@ -55,10 +70,10 @@ HarmonyClient.prototype.sendCommand = function(command, payload) {
 		console.log('Stanza: ', iq.root().toString());
 
 		client.send(iq);
-		client.end();
+		// client.end();
 	});
 	
-	client.on('stanza', function(stanza) {
+	client.addListener('stanza', function(stanza) {
 		console.log('Received stanza: ', stanza.toString());
 		
 		// parse for session token
@@ -66,8 +81,10 @@ HarmonyClient.prototype.sendCommand = function(command, payload) {
 			var oa = stanza.getChild('oa');
 			if (oa.attrs.errorcode == '200') {
 				console.log('Return text: ' + oa.getText());
-				self.emit('complete', oa.getText());
+				self.emit('result', oa.getText());
 			}
+			
+			client.end();
 		}
 	});
 	
@@ -79,6 +96,12 @@ HarmonyClient.prototype.sendCommand = function(command, payload) {
 
 HarmonyClient.prototype.getHubConfig = function() {
 	console.log('Getting hub config...');
+	
+	var self = this;
+	this.on('result', function(resp) {
+		// console.log('Complete return: ' + resp);
+		self.emit('config', resp);
+	});
 	
 	if (this.authenticated) {
 		this.sendCommand('config');
@@ -104,7 +127,9 @@ HarmonyClient.prototype.startActivity = function(activityId) {
 		});
 	}
 	
-	this.once('complete', function(resp) {
+	var self = this;
+	
+	this.once('result', function(resp) {
 		console.log(resp);
 		if (activityId != -1) {
 			console.log('Activity started...');
@@ -112,11 +137,19 @@ HarmonyClient.prototype.startActivity = function(activityId) {
 		else {
 			console.log('Activity stopped...');
 		}
+		
+		self.emit('started', activityId);
 	});
 };
 
 HarmonyClient.prototype.getCurrentActivity = function() {
 	console.log('Getting current activity...');
+	
+	var self = this;
+	this.on('result', function(resp) {
+		var pieces = resp.split('=');
+		self.emit('current', pieces[1]);
+	});
 	
 	if (this.authenticated) {
 		this.sendCommand('getCurrentActivity');
@@ -132,16 +165,12 @@ HarmonyClient.prototype.powerOff = function() {
 	console.log('Powering off activity...');
 	
 	// Get current activity
-	// this.getCurrentActivity();
-	this.startActivity(-1);
-	
-	/*
-	this.once('complete', function(currentActivityId) {
+	this.getCurrentActivity();
+	this.once('current', function(currentActivityId) {
 		if (currentActivityId != -1) {
 			this.startActivity(-1);
 		}
 	});
-	*/
 };
 
 module.exports = HarmonyClient;

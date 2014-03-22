@@ -10,6 +10,8 @@ var harmonyCredential =
 
 var harmonyHubIp = '192.168.0.110';
 var harmonyHubPort = 5222;
+// var harmonyHubIp = 'lordwu.no-ip.com';
+// var harmonyHubPort = 10222;
 
 exports.harmonyCredential = harmonyCredential;
 exports.harmonyHubIp = harmonyHubIp;
