@@ -51,7 +51,15 @@ app.get('/harmony/start/:activityId', function(req, res) {
 	});
 });
 
-var server = app.listen(3000, function() {
+app.get('/harmony', function(req, res) {
+	res.send(harmony.activities);
+});
+
+app.get('/', function(req, res) {
+	res.send('Welcome to Control Center');
+});
+
+var server = app.listen(3000, '0.0.0.0', function() {
 	console.log('Listening on port %d', server.address().port);
 });
 
