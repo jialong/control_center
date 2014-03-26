@@ -166,9 +166,17 @@ HarmonyClient.prototype.powerOff = function() {
 	
 	// Get current activity
 	this.getCurrentActivity();
+	
+	var self = this;
 	this.once('current', function(currentActivityId) {
 		if (currentActivityId != -1) {
-			this.startActivity(-1);
+			self.startActivity(-1);
+			self.once('started', function(activityId) {
+				self.emit('poweroff');
+			});
+		}
+		else {
+			self.emit('poweroff');
 		}
 	});
 };

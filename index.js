@@ -18,7 +18,7 @@ app.get('/harmony/poweroff', function(req, res) {
 	
 	harmony.powerOff();
 	
-	harmony.on('complete', function() {
+	harmony.once('poweroff', function() {
 		console.log('Current activity turned off');
 		res.send({status: 'ok'});
 	});
@@ -27,7 +27,7 @@ app.get('/harmony/poweroff', function(req, res) {
 app.get('/harmony/conf', function(req, res) {
 	harmony.getHubConfig();
 	
-	harmony.on('config', function(resp) {
+	harmony.once('config', function(resp) {
 		console.log('Got remote config');
 		res.send(resp);
 	});
@@ -36,7 +36,7 @@ app.get('/harmony/conf', function(req, res) {
 app.get('/harmony/current', function(req, res) {
 	harmony.getCurrentActivity();
 	
-	harmony.on('current', function(resp) {
+	harmony.once('current', function(resp) {
 		console.log('Current activity ' + resp);
 		res.send(resp);
 	});	
@@ -45,7 +45,7 @@ app.get('/harmony/current', function(req, res) {
 app.get('/harmony/start/:activityId', function(req, res) {
 	harmony.startActivity(req.params.activityId);
 	
-	harmony.on('started', function(resp) {
+	harmony.once('started', function(resp) {
 		console.log('Started activity ' + resp);
 		res.send(resp);
 	});
