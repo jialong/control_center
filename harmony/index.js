@@ -82,9 +82,20 @@ HarmonyClient.prototype.sendCommand = function(command, payload) {
 			if (oa.attrs.errorcode == '200') {
 				console.log('Return text: ' + oa.getText());
 				self.emit('result', oa.getText());
+				
+				client.end();
 			}
-			
-			client.end();
+			else if (oa.attrs.errorcode == '100') {
+				// continue
+				// <iq id="1395808914194" type="get" xmlns:stream="http://etherx.jabber.org/streams"><oa xmlns="connect.logitech.com" mime="vnd.logitech.harmony/vnd.logitech.harmony.engine?startactivity" errorcode="100" errorstring="Continue">done=1:total=2:deviceId=17956355</oa></iq>
+				var iq = new Element(
+				        'iq',
+				        { type: 'get', id: new Date().getTime() }
+				    ).c('oa', { xmlns: 'connect.logitech.com', mime: 'vnd.logitech.harmony/vnd.logitech.harmony.engine?' + command });
+				console.log('Continue stanza: ', iq.root().toString());
+				
+				client.send(iq);
+			}
 		}
 	});
 	
@@ -133,12 +144,14 @@ HarmonyClient.prototype.startActivity = function(activityId) {
 		console.log(resp);
 		if (activityId != -1) {
 			console.log('Activity started...');
+			
+			self.emit('started', activityId);
 		}
 		else {
 			console.log('Activity stopped...');
+			
+			self.emit('stopped');
 		}
-		
-		self.emit('started', activityId);
 	});
 };
 
@@ -171,7 +184,7 @@ HarmonyClient.prototype.powerOff = function() {
 	this.once('current', function(currentActivityId) {
 		if (currentActivityId != -1) {
 			self.startActivity(-1);
-			self.once('started', function(activityId) {
+			self.once('stopped', function() {
 				self.emit('poweroff');
 			});
 		}
